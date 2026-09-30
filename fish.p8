@@ -71,7 +71,7 @@ function player:getbite()
 		size = "medium"
 	end
 	
-	local pool = fish[size]
+	local pool = fish[game.area.name][size]
 	local hook = pool[flr(rnd(#pool)) + 1]
 	
 	return hook, size
@@ -143,11 +143,6 @@ function player:init()
 	self.bobbler = nil
 	self.hooked = nil
 	self.hooked_size = nil
-	
-	-- testing
-	self.state = "caught"
-	self.hooked, self.hooked_size 
-	 = self:getbite()
 end
 
 function player:update()
@@ -378,10 +373,6 @@ end
 -- data
 
 -- todo
--- fish are accessible
--- only in some areas
-
--- todo
 -- money payout
 -- xp payout
 -- weighted random
@@ -389,19 +380,25 @@ end
 -- rarer than others
 
 -- todo
+-- minigame stuff
+-- speed, dash speed, aggressiveness
+
+-- todo
 -- description
 fish = {
-	small = { 
-		{name = "minnow"}, 
-		{name = "guppy"} 
-	},
-	medium = { 
-		{name = "bass"}, 
-		{name = "trout"} 
-	},
-	large = { 
-		{name = "tuna"}, 
-		{name = "shark"} 
+	forest = {
+		small = { 
+			{name = "minnow"}, 
+			{name = "guppy"} 
+		},
+		medium = { 
+			{name = "bass"}, 
+			{name = "trout"} 
+		},
+		large = { 
+			{name = "tuna"}, 
+			{name = "shark"} 
+		}
 	}
 }
 
@@ -409,6 +406,7 @@ fish = {
 -- more areas
 areas = {
 	forest = {
+		name = "forest",
 		clr = 3,
 		
 		minx = 0,
@@ -445,9 +443,6 @@ function game:draw()
 	if player.state == "minigame" then
 	
 	elseif player.state == "caught" then
-		-- todo
-		-- image
-		
 		-- body
 		rectfill(
 			self.padding, self.padding,
