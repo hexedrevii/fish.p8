@@ -71,7 +71,26 @@ function player:tobobbler()
 	)
 end
 
+__debug_force_fish = false
+__debug_fish = {
+	name = "tuna",
+	area = "forest",
+	size = "small",
+}
+
 function player:getbite()
+	if __debug_force_fish then
+		local fs = nil
+		for _, f in ipairs(fish[__debug_fish.area][__debug_fish.size]) do
+			if f.name == __debug_fish.name then
+				fs = f
+				break
+			end
+		end
+
+		return fs, __debug_fish.size
+	end
+
 	local roll = randr(1, 100)
 	local chances = self.rod.chances
 	local size = "small"
@@ -81,15 +100,13 @@ function player:getbite()
 	elseif roll > chances[1] then
 		size = "medium"
 	end
-	
-	-- test
-	-- until i add more fish
-	-- lol
+
+	-- testing
 	size = "small"
 	
 	local pool = fish[game.area.name][size]
 	local hook = pool[flr(rnd(#pool)) + 1]
-	
+
 	return hook, size
 end
 
@@ -129,19 +146,8 @@ function player:init()
 	-- rod or player level
 	-- also, global table 
 	-- for these :sob:
-	self.rod = {
-		name = "bamboo",
-		power = 1.4,
-		
-		mult = 1,
-		width = 15,
-		
-		-- small, medium, large
-		chances = {
-			75, 20, 5
-		}
-	}
-	
+	self.rod = rods["bomboo"]
+
 	self.inventory = {
 		-- todo
 		-- accesories
@@ -283,8 +289,9 @@ function player:update()
 			self.fish = {
 				x = 64,
 				target = 64,
-				
-				timer = 0,
+			
+				-- 20 frame grace period
+				timer = 20,
 				dashing = false,
 				
 				progress = 50,
@@ -449,7 +456,7 @@ function player:draw()
 		self.bobbler:draw()
 		
 		spr(6, self.x, self.y - 10)
-	elseif self.state == "minigane" then
+	elseif self.state == "minigame" then
 		self:tobobbler()
 		self.bobbler:draw()
 	end
@@ -522,13 +529,15 @@ end
 
 -- todo
 -- description
-function mkfish(name, desc, spd, aggr, dspd)
+function mkfish(name, desc, xp, mon, spd, aggr, dspd)
 	return {
 		name = name,
 		desc = desc,
 		spd = spd,
 		aggr = aggr,
 		dspd = dspd,
+		xp = xp,
+		sell = mon,
 	}
 end
 
@@ -537,10 +546,24 @@ end
 fish = {
 	forest = {
 		small = { 
-			mkfish("minnow", nil, 1.0, 0.2, 2.0),
-			mkfish("guppy", nil, 1.0, 0.2, 2.0)
+			mkfish("minnow", nil, nil, nil, 0.8, 0.2, 1.0),
+			mkfish("tuna", nil, nil, nil, 1.0, 0.4, 1.5),
 		}
 	}
+}
+
+rods = {
+	["bomboo"] = {
+		name = "bamboo",
+		power = 1.4,
+		
+		mult = 1,
+		width = 12,
+		
+		chances = {
+			75, 20, 5
+		},
+	},
 }
 
 minigame = {
@@ -592,6 +615,19 @@ function game:draw()
 	?"x " .. player.x .. " y " .. player.y
 	
 	if player.state == "minigame" then
+		-- background
+		local offset = 5
+		local bh = 35
+		rrectfill(
+			minigame.minx - offset, minigame.y - offset,
+			minigame.maxx + offset * 2, bh, 3, 4 
+		)
+
+		rrect(
+			minigame.minx - offset, minigame.y - offset,
+			minigame.maxx + offset * 2, bh, 3, 7 
+		)
+
 		local fish = player.fish
 		
 		rrect(
