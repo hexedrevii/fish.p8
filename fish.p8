@@ -469,6 +469,12 @@ areas = {
 		
 		minx = 0,
 		miny = 0,
+
+		cminx = 0,
+		cminy = 0,
+
+		cmaxx = 248,
+		cmaxy = 248,
 	}
 }
 
@@ -697,7 +703,12 @@ end
 function game:draw()
 	cls(self.area.clr)
 
-	camera(player.x - 60, player.y - 60)
+	local cx, cy = player.x - 60, player.y - 60
+
+	cx = mid(self.area.cminx, cx, self.area.cmaxx - 120)
+	cy = mid(self.area.cminy, cy, self.area.cmaxy - 120)
+
+	camera(cx, cy)
 	map(self.area.minx, self.area.miny)
 	player:draw()
 	
